@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#132077" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Almacén HEAS" />
+  <meta name="description" content="Saldos del Almacén de Farmacia (Almacén Israel) - Hospital El Alto Sur" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>Almacén de Farmacia – El Alto Sur</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --blue-dark: #132077;
+      --green: #018e44;
+      --green-tab: #1f9d57;
+      --green-light: #e6f4ec;
+      --accent: #e74c3c;
+      --accent-light: #fdecea;
+      --amber: #b7791f;
+      --amber-light: #fff4d6;
+      --text: #1c2833;
+      --text-muted: #717d7e;
+      --border: #d5dbdb;
+      --bg: #f2f3f4;
+      --white: #ffffff;
+      --radius: 12px;
+      --shadow: 0 2px 8px rgba(0,0,0,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    header { background: var(--blue-dark); color: #fff; padding: calc(16px + env(safe-area-inset-top)) 16px 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+    .header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .header-logo { width: 46px; height: 46px; border-radius: 10px; background: #fff; flex-shrink: 0; }
+    .header-title { flex: 1; min-width: 0; }
+    .header-title h1 { font-size: 17px; font-weight: 600; letter-spacing: .2px; line-height: 1.2; }
+    .header-title .mono { font-size: 11px; opacity: .8; margin-top: 2px; font-family: 'IBM Plex Mono', monospace; }
+    .header-title .dev { font-size: 10px; opacity: .65; margin-top: 1px; }
+    #installBtn { display: none; background: #fff; color: var(--blue-dark); border: 0; border-radius: 20px; padding: 7px 12px; font: 600 12px 'IBM Plex Sans', sans-serif; cursor: pointer; }
+    .search-wrap { background: rgba(255,255,255,.12); border-radius: var(--radius) var(--radius) 0 0; padding: 12px 12px 0; }
+    .search-box { display: flex; align-items: center; background: #fff; border-radius: 8px; padding: 0 14px; gap: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+    .search-box svg { color: var(--green); flex-shrink: 0; }
+    #searchInput { flex: 1; min-width: 0; border: none; outline: none; font: 16px 'IBM Plex Sans', sans-serif; padding: 13px 0; color: var(--text); background: transparent; }
+    #searchInput::placeholder { color: #aab; }
+    #searchInput::-webkit-search-cancel-button { display: none; }
+    #clearBtn { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 20px; padding: 4px; display: none; line-height: 1; }
+    .filter-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px 0 12px; }
+    .filter-tabs.three { grid-template-columns: repeat(3, 1fr); }
+    .tab { --c: #888; background: var(--c); color: #fff; border: 2px solid transparent; border-radius: 20px; padding: 6px 8px; font: 500 13px 'IBM Plex Sans', sans-serif; line-height: 1.15; min-height: 40px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; opacity: .8; transition: all .2s; }
+    .tab b { font-family: 'IBM Plex Mono', monospace; font-weight: 500; background: rgba(255,255,255,.22); border-radius: 10px; padding: 1px 7px; font-size: 12px; }
+    .tab.active { opacity: 1; font-weight: 700; border-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.35); transform: translateY(-1px); }
+    .tab[hidden] { display: none; }
+    .results-bar { --c: var(--green-tab); border-left: 6px solid var(--c); padding: 8px 12px 8px 14px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    #resultsText { font-size: 12px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; flex: 1 1 100%; }
+    .seg { display: flex; background: var(--bg); border-radius: 8px; padding: 2px; }
+    .seg button { border: 0; background: none; font: 500 12px 'IBM Plex Sans', sans-serif; color: var(--text-muted); padding: 5px 9px; border-radius: 6px; cursor: pointer; }
+    .seg button.on { background: #fff; color: var(--blue-dark); font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+    #sortSel { margin-left: auto; border: 1px solid var(--border); background: #fff; border-radius: 8px; padding: 5px 8px; font: 500 12px 'IBM Plex Sans', sans-serif; color: var(--text); }
+    #listContainer { padding: 8px 12px calc(40px + env(safe-area-inset-bottom)); max-width: 820px; margin: 0 auto; }
+    .card { background: #fff; border-radius: var(--radius); margin-bottom: 8px; box-shadow: var(--shadow); overflow: hidden; cursor: pointer; border-left: 4px solid var(--green); transition: transform .15s; animation: fadeIn .2s ease; }
+    .card.cero { border-left-color: var(--accent); }
+    .card:active { transform: scale(.98); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .card-body { padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+    .card-main { flex: 1; min-width: 0; }
+    .card-name { font-size: 15px; font-weight: 600; line-height: 1.3; margin-bottom: 3px; }
+    .card-sub { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
+    .card-code { font: 500 11px 'IBM Plex Mono', monospace; color: var(--text-muted); margin-top: 4px; }
+    .pill { font: 600 9px 'IBM Plex Sans', sans-serif; letter-spacing: .5px; padding: 1px 6px; border-radius: 6px; background: #dde1f4; color: var(--blue-dark); margin-left: 4px; vertical-align: 1px; }
+    .pill.ins { background: #ececec; color: #555; }
+    .stock { text-align: right; flex-shrink: 0; font: 500 18px 'IBM Plex Mono', monospace; color: var(--blue-dark); line-height: 1.1; }
+    .stock small { display: block; font: 10px 'IBM Plex Sans', sans-serif; color: var(--text-muted); margin-top: 2px; }
+    .stock.cero { color: var(--accent); }
+    .card-foot { padding: 7px 14px; font-size: 12px; font-weight: 500; display: flex; gap: 6px; align-items: center; background: var(--green-light); color: #0b6b34; }
+    .card-foot.warn { background: var(--amber-light); color: var(--amber); }
+    .card-foot.bad { background: var(--accent-light); color: var(--accent); }
+    mark { background: #ffe58a; color: inherit; border-radius: 3px; }
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty-icon { font-size: 44px; margin-bottom: 12px; }
+    .empty h3 { font-size: 17px; font-weight: 600; color: var(--text); }
+    .empty p { font-size: 13px; margin-top: 6px; }
+    #moreBtn { display: block; margin: 12px auto; border: 1px solid var(--border); background: #fff; color: var(--blue-dark); padding: 10px 20px; border-radius: 10px; font: 600 14px 'IBM Plex Sans', sans-serif; cursor: pointer; }
+    #moreBtn[hidden] { display: none; }
+    footer { text-align: center; font-size: 11px; color: var(--text-muted); padding: 4px 16px 28px; line-height: 1.6; }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 200; align-items: flex-end; justify-content: center; }
+    .overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 20px 20px 0 0; width: 100%; max-width: 520px; max-height: 85vh; overflow-y: auto; animation: slideUp .25s ease; padding-bottom: env(safe-area-inset-bottom); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
+    .modal-header { background: var(--blue-dark); color: #fff; padding: 20px 20px 18px; margin-top: 8px; }
+    .modal-header h2 { font-size: 18px; font-weight: 600; line-height: 1.3; }
+    .modal-codigo { font: 500 12px 'IBM Plex Mono', monospace; opacity: .75; margin-top: 4px; }
+    .modal-body { padding: 8px 20px 16px; }
+    .detail-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font: 600 10px 'IBM Plex Mono', monospace; letter-spacing: .8px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+    .detail-value { font-size: 16px; font-weight: 500; line-height: 1.4; }
+    .big { font: 500 28px 'IBM Plex Mono', monospace; color: var(--blue-dark); }
+    .big.cero { color: var(--accent); }
+    table.lotes { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+    table.lotes th { text-align: left; font: 600 10px 'IBM Plex Mono', monospace; color: var(--text-muted); text-transform: uppercase; padding: 4px 4px; }
+    table.lotes td { padding: 7px 4px; border-top: 1px solid var(--border); }
+    table.lotes td:last-child, table.lotes th:last-child { text-align: right; font-family: 'IBM Plex Mono', monospace; }
+    .v-bad { color: var(--accent); font-weight: 600; } .v-warn { color: var(--amber); font-weight: 600; } .v-ok { color: #0b6b34; }
+    .note { font-size: 12px; color: var(--text-muted); background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+    .modal-close { display: block; width: calc(100% - 40px); margin: 0 20px 20px; padding: 14px; background: var(--blue-dark); color: #fff; border: none; border-radius: 10px; font: 600 15px 'IBM Plex Sans', sans-serif; cursor: pointer; }
+    #offline { position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: #333; color: #fff; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: none; z-index: 150; white-space: nowrap; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <img class="header-logo" src="icon-192.png" alt="HEAS" />
+    <div class="header-title">
+      <h1>Almacén de Farmacia</h1>
+      <div class="mono">HOSPITAL EL ALTO SUR · ALMACÉN ISRAEL</div>
+      <div class="dev">Desarrollado por: Marcelo Oviedo Lazcano · UNIDAD DE FARMACIA</div>
+    </div>
+    <button id="installBtn">Instalar</button>
+  </div>
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="searchInput" type="search" placeholder="Buscar medicamento, insumo o código…" autocomplete="off" />
+      <button id="clearBtn" aria-label="Limpiar">×</button>
+    </div>
+    <div class="filter-tabs" id="tabs">
+      <button class="tab active" data-tab="con" style="--c:#1f9d57">Con stock <b id="nCon">0</b></button>
+      <button class="tab" data-tab="cero" style="--c:#e74c3c">En cero <b id="nCero">0</b></button>
+      <button class="tab" data-tab="venc" style="--c:#d4a72c" hidden>⏳ Por vencer <b id="nVenc">0</b></button>
+    </div>
+  </div>
+</header>
+
+<div class="results-bar" id="resultsBar">
+  <div id="resultsText">Cargando…</div>
+  <div class="seg" id="kindSeg">
+    <button class="on" data-k="">Todos</button>
+    <button data-k="medicamento">Medicamentos</button>
+    <button data-k="insumo">Insumos</button>
+  </div>
+  <select id="sortSel" aria-label="Ordenar">
+    <option value="n">A → Z</option>
+    <option value="q">Mayor saldo</option>
+    <option value="qa">Menor saldo</option>
+  </select>
+</div>
+
+<div id="listContainer"></div>
+<button id="moreBtn" hidden>Ver más</button>
+<footer id="foot"></footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+<div id="offline">Sin conexión · mostrando datos guardados</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const norm = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = n => Number(n).toLocaleString("es-BO");
+const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const fFecha = d => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || ""); return m ? `${m[3]}/${MESES[+m[2]-1]}/${m[1]}` : esc(d); };
+const PAGE = 60, MESES_ALERTA = 6;
+
+let DATA = [], META = {}, tab = "con", kind = "", sort = "n", query = "", shown = PAGE;
+
+// Estado de vencimiento de un lote: vencido / por vencer (≤ 6 meses) / ok
+const hoy = new Date(); hoy.setHours(0,0,0,0);
+const limite = new Date(hoy); limite.setMonth(limite.getMonth() + MESES_ALERTA);
+function estadoVenc(f) {
+  const d = new Date((f || "") + "T00:00:00");
+  if (isNaN(d)) return "";
+  return d < hoy ? "bad" : d <= limite ? "warn" : "ok";
+}
+function proximo(it) { return (it.lotes || []).find(l => l.fecha_vencimiento && l.cantidad > 0); }
+
+function hl(t) {
+  const w = norm(query).split(/\s+/).filter(Boolean)[0];
+  if (!w) return esc(t);
+  const i = norm(t).indexOf(w);
+  if (i < 0) return esc(t);
+  return esc(t.slice(0, i)) + "<mark>" + esc(t.slice(i, i + w.length)) + "</mark>" + esc(t.slice(i + w.length));
+}
+
+function render(reset) {
+  if (reset) shown = PAGE;
+  const words = norm(query).split(/\s+/).filter(Boolean);
+  const base = DATA.filter(x => (!kind || x.tipo === kind) && words.every(w => x._s.includes(w)));
+  const con = base.filter(x => x.cantidad > 0), cero = base.filter(x => x.cantidad <= 0);
+  const venc = con.filter(x => { const p = proximo(x); return p && estadoVenc(p.fecha_vencimiento) !== "ok"; });
+  $("#nCon").textContent = fmt(con.length);
+  $("#nCero").textContent = fmt(cero.length);
+  $("#nVenc").textContent = fmt(venc.length);
+
+  let L = tab === "con" ? con : tab === "cero" ? cero : venc;
+  const byName = (a, b) => a.medicamento.localeCompare(b.medicamento, "es") || a.concentracion.localeCompare(b.concentracion, "es");
+  L = L.slice().sort(
+    tab === "venc" ? (a, b) => proximo(a).fecha_vencimiento.localeCompare(proximo(b).fecha_vencimiento)
+    : sort === "q" ? (a, b) => b.cantidad - a.cantidad
+    : sort === "qa" ? (a, b) => a.cantidad - b.cantidad
+    : byName);
+
+  const color = { con: "#1f9d57", cero: "#e74c3c", venc: "#d4a72c" }[tab];
+  $("#resultsBar").style.setProperty("--c", color);
+  const lbl = { con: "con stock", cero: "en cero", venc: "por vencer (≤ 6 meses) o vencidos" }[tab];
+  $("#resultsText").textContent = `${fmt(L.length)} ítems ${lbl}${query ? ` · “${query}”` : ""}`;
+  $("#sortSel").disabled = tab === "venc";
+
+  $("#listContainer").innerHTML = L.length ? L.slice(0, shown).map(card).join("") : `
+    <div class="empty"><div class="empty-icon">🔍</div>
+      <h3>Sin resultados</h3>
+      <p>${query ? `No hay ítems ${lbl} para “${esc(query)}”.` : "No hay ítems en esta pestaña."}
+      ${tab === "con" && cero.length ? "<br>Revisa la pestaña <b>En cero</b>." : ""}
+      ${tab === "cero" && con.length ? "<br>Revisa la pestaña <b>Con stock</b>." : ""}</p></div>`;
+  $("#moreBtn").hidden = L.length <= shown;
+}
+
+function card(x) {
+  const i = DATA.indexOf(x), z = x.cantidad <= 0, p = proximo(x);
+  let foot = "";
+  if (p) {
+    const e = estadoVenc(p.fecha_vencimiento);
+    const t = e === "bad" ? "VENCIDO" : e === "warn" ? "Por vencer" : "Vence";
+    foot = `<div class="card-foot ${e === "ok" ? "" : e}">${e === "ok" ? "✓" : "⏳"} ${t}: ${fFecha(p.fecha_vencimiento)}${p.lote ? " · Lote " + esc(p.lote) : ""}${x.lotes.length > 1 ? ` · ${x.lotes.length} lotes` : ""}</div>`;
+  }
+  return `<div class="card ${z ? "cero" : ""}" data-i="${i}">
+    <div class="card-body">
+      <div class="card-main">
+        <div class="card-name">${hl(x.medicamento)}</div>
+        <div class="card-sub">${esc(x.forma)}${x.concentracion ? " · " + esc(x.concentracion) : ""}</div>
+        <div class="card-code">${hl(x.codigo)}<span class="pill ${x.tipo === "insumo" ? "ins" : ""}">${x.tipo === "insumo" ? "INSUMO" : "MED"}</span></div>
+      </div>
+      <div class="stock ${z ? "cero" : ""}">${fmt(x.cantidad)}<small>${z ? "sin stock" : "saldo"}</small></div>
+    </div>${foot}</div>`;
+}
+
+function openDetail(x) {
+  const z = x.cantidad <= 0;
+  const lotes = (x.lotes || []).length
+    ? `<table class="lotes"><tr><th>Lote</th><th>Vencimiento</th><th>Cant.</th></tr>${x.lotes.map(l =>
+        `<tr><td>${esc(l.lote || "—")}</td><td class="v-${estadoVenc(l.fecha_vencimiento)}">${l.fecha_vencimiento ? fFecha(l.fecha_vencimiento) : "—"}</td><td>${fmt(l.cantidad)}</td></tr>`).join("")}</table>`
+    : `<div class="note">Vencimientos aún no cargados.</div>`;
+  $("#modal").innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-header"><h2>${esc(x.medicamento)}</h2><div class="modal-codigo">${esc(x.codigo)}</div></div>
+    <div class="modal-body">
+      <div class="detail-row"><div class="detail-label">Saldo en almacén</div><div class="big ${z ? "cero" : ""}">${fmt(x.cantidad)}</div></div>
+      <div class="detail-row"><div class="detail-label">Forma farmacéutica</div><div class="detail-value">${esc(x.forma) || "—"}</div></div>
+      <div class="detail-row"><div class="detail-label">Concentración</div><div class="detail-value">${esc(x.concentracion) || "—"}</div></div>
+      <div class="detail-row"><div class="detail-label">Tipo</div><div class="detail-value">${x.tipo === "insumo" ? "Insumo / dispositivo" : "Medicamento"}</div></div>
+      <div class="detail-row"><div class="detail-label">Lotes y vencimientos</div>${lotes}</div>
+      <div class="detail-row"><div class="note">Saldo al cierre de ${esc(META.mes || "—")}. Confirme con Farmacia antes de solicitar.</div></div>
+    </div>
+    <button class="modal-close" id="closeBtn">Cerrar</button>`;
+  $("#overlay").classList.add("open");
+  $("#closeBtn").onclick = closeDetail;
+  history.pushState({ modal: 1 }, "");
+}
+function closeDetail() { if ($("#overlay").classList.contains("open")) { $("#overlay").classList.remove("open"); if (history.state && history.state.modal) history.back(); } }
+addEventListener("popstate", () => $("#overlay").classList.remove("open"));
+$("#overlay").onclick = e => { if (e.target.id === "overlay") closeDetail(); };
+$("#listContainer").onclick = e => { const c = e.target.closest(".card"); if (c) openDetail(DATA[+c.dataset.i]); };
+
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t === b));
+  tab = b.dataset.tab; render(true); scrollTo(0, 0);
+});
+document.querySelectorAll("#kindSeg button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#kindSeg button").forEach(t => t.classList.toggle("on", t === b));
+  kind = b.dataset.k; render(true);
+});
+$("#sortSel").onchange = e => { sort = e.target.value; render(true); };
+let tm;
+$("#searchInput").oninput = e => { query = e.target.value.trim(); $("#clearBtn").style.display = query ? "block" : "none"; clearTimeout(tm); tm = setTimeout(() => render(true), 120); };
+$("#clearBtn").onclick = () => { $("#searchInput").value = ""; query = ""; $("#clearBtn").style.display = "none"; render(true); $("#searchInput").focus(); };
+$("#moreBtn").onclick = () => { shown += PAGE; render(); };
+
+fetch("almacen.json").then(r => r.json()).then(j => {
+  META = j; DATA = j.items || [];
+  DATA.forEach(x => x._s = norm([x.medicamento, x.codigo, x.forma, x.concentracion].join(" ")));
+  if (DATA.some(x => (x.lotes || []).length)) { $("#tabs").classList.add("three"); document.querySelector('[data-tab="venc"]').hidden = false; }
+  $("#foot").innerHTML = `Saldos al cierre de <b>${esc(j.mes || "—")}</b> · Actualizado ${fFecha(j.actualizado)} · ${fmt(DATA.length)} ítems<br>Fuente: IMM Almacén Israel – Hospital El Alto Sur`;
+  render(true);
+}).catch(() => { $("#resultsText").textContent = "No se pudieron cargar los datos. Revise su conexión."; });
+
+const off = () => $("#offline").style.display = navigator.onLine ? "none" : "block";
+addEventListener("online", off); addEventListener("offline", off); off();
+let deferred;
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferred = e; $("#installBtn").style.display = "block"; });
+$("#installBtn").onclick = async () => { if (!deferred) return; deferred.prompt(); await deferred.userChoice; deferred = null; $("#installBtn").style.display = "none"; };
+if ("serviceWorker" in navigator) addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+</script>
+</body>
+</html>

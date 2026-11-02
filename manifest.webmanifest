@@ -1,0 +1,18 @@
+{
+  "id": "almacen-heas",
+  "name": "Almacén de Farmacia - Hospital El Alto Sur",
+  "short_name": "Almacén HEAS",
+  "description": "Saldos del Almacén de Farmacia (Almacén Israel) - Hospital El Alto Sur",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#132077",
+  "theme_color": "#132077",
+  "lang": "es",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
