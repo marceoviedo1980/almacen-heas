@@ -110,6 +110,15 @@
     .modal-close { display: block; width: calc(100% - 40px); margin: 0 20px 20px; padding: 14px; background: var(--blue-dark); color: #fff; border: none; border-radius: 10px; font: 600 15px 'IBM Plex Sans', sans-serif; cursor: pointer; }
     #offline { position: fixed; bottom: calc(14px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); background: #333; color: #fff; font-size: 12px; padding: 6px 14px; border-radius: 20px; display: none; z-index: 150; white-space: nowrap; }
   </style>
+  <!-- Google Analytics 4 (propiedad PWAs Farmacia) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TC780WL98K"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('set', { hospital: 'HEAS', app_nombre: 'Almacen HEAS' });
+    gtag('config', 'G-TC780WL98K');
+  </script>
 </head>
 <body>
 <header>
