@@ -2,7 +2,7 @@
 // Otras PWA del mismo dominio (marceoviedo1980.github.io) no se tocan.
 const PREFIX = 'almacen-heas-';
 // Cambia este número cada vez que subas un almacen.json nuevo
-const CACHE = PREFIX + 'v5';
+const CACHE = PREFIX + 'v6';
 const FILES = ['./index.html', './almacen.json', './vencimientos.json', './manifest.webmanifest', './icon-192.png', './icon-512.png', './logo-heas.png'];
 
 self.addEventListener('install', e => {
